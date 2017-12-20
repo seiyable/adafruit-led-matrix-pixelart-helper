@@ -2,7 +2,7 @@
  Vue Template
 ================================================== -->
 <template>
-  <div class="pixel" :style="{'background-color': getBgColor}" @click="toggle()" >
+  <div class="pixel" :style="{'background-color': getBgColor}" @click="toggle()" @mouseover="hover($event)">
   </div>
 </template>
 
@@ -14,10 +14,7 @@ export default {
   name: 'pixel',
   props: {
     x: Number,
-    y: Number,
-    selectedColor: Object,
-    selectedBgColor: String,
-    selectedBit: Number
+    y: Number
   },
   data () {
     return {
@@ -38,16 +35,37 @@ export default {
   },
   methods: {
     toggle () {
-      // if (e.buttons === 1) {
-      this.isActive = !this.isActive
-      if (this.isActive) {
-        this.color = this.selectedColor
-        this.bgColor = this.selectedBgColor
-        this.$emit('added', {x: this.x, y: this.y, color: this.color})
-      } else {
-        this.$emit('removed', {x: this.x, y: this.y})
+      if (this.$store.state.drawingMode === 'one-by-one') {
+        this.isActive = !this.isActive
+        if (this.isActive) {
+          this.addToList()
+        } else {
+          this.removeFromList()
+        }
       }
-      // }
+    },
+    hover (e) {
+      if (e.buttons !== 1) return
+
+      if (this.$store.state.drawingMode === 'keep-painting') {
+        if (!this.isActive) {
+          this.isActive = true
+          this.addToList()
+        }
+      } else if (this.$store.state.drawingMode === 'keep-erasing') {
+        if (this.isActive) {
+          this.isActive = false
+          this.removeFromList()
+        }
+      }
+    },
+    addToList () {
+      this.color = this.$store.state.selectedColor
+      this.bgColor = this.$store.state.selectedBgColor
+      this.$emit('added', {x: this.x, y: this.y, color: this.color})
+    },
+    removeFromList () {
+      this.$emit('removed', {x: this.x, y: this.y})
     },
     resetValues () {
       this.isActive = false

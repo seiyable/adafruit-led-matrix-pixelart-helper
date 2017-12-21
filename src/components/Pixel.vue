@@ -14,63 +14,45 @@ export default {
   name: 'pixel',
   props: {
     x: Number,
-    y: Number
-  },
-  data () {
-    return {
-      isActive: false,
-      color: {},
-      bgColor: ''
-    }
-  },
-  watch: {
-    selectedBit (val) {
-      this.resetValues()
-    }
+    y: Number,
+    bgColorValue: String,
+    isActive: Boolean
   },
   computed: {
     getBgColor () {
-      return this.isActive ? this.bgColor : 'darkgrey'
+      return this.isActive ? this.bgColorValue : 'darkgrey'
     }
   },
   methods: {
     toggle () {
       if (this.$store.state.drawingMode === 'one-by-one') {
-        this.isActive = !this.isActive
-        if (this.isActive) {
-          this.addToList()
-        } else {
-          this.removeFromList()
-        }
+        this.$store.commit('updatePixel', {x: this.x, y: this.y, isActive: !this.isActive})
       }
     },
     hover (e) {
       if (e.buttons !== 1) return
 
-      if (this.$store.state.drawingMode === 'keep-painting') {
-        if (!this.isActive) {
-          this.isActive = true
-          this.addToList()
-        }
-      } else if (this.$store.state.drawingMode === 'keep-erasing') {
-        if (this.isActive) {
-          this.isActive = false
-          this.removeFromList()
-        }
+      switch (this.$store.state.drawingMode) {
+        case 'keep-painting':
+          this.$store.commit('updatePixel', {x: this.x, y: this.y, isActive: true})
+          break
+        case 'keep-painting-large':
+          this.$store.commit('updatePixel', {x: this.x, y: this.y, isActive: true})
+          this.$store.commit('updatePixel', {x: this.x, y: this.y - 1, isActive: true})
+          this.$store.commit('updatePixel', {x: this.x, y: this.y + 1, isActive: true})
+          this.$store.commit('updatePixel', {x: this.x - 1, y: this.y - 1, isActive: true})
+          this.$store.commit('updatePixel', {x: this.x - 1, y: this.y, isActive: true})
+          this.$store.commit('updatePixel', {x: this.x - 1, y: this.y + 1, isActive: true})
+          this.$store.commit('updatePixel', {x: this.x + 1, y: this.y - 1, isActive: true})
+          this.$store.commit('updatePixel', {x: this.x + 1, y: this.y, isActive: true})
+          this.$store.commit('updatePixel', {x: this.x + 1, y: this.y + 1, isActive: true})
+          break
+        case 'keep-erasing':
+          if (this.isActive) {
+            this.$store.commit('updatePixel', {x: this.x, y: this.y, isActive: false})
+          }
+          break
       }
-    },
-    addToList () {
-      this.color = this.$store.state.selectedColor
-      this.bgColor = this.$store.state.selectedBgColor
-      this.$emit('added', {x: this.x, y: this.y, color: this.color})
-    },
-    removeFromList () {
-      this.$emit('removed', {x: this.x, y: this.y})
-    },
-    resetValues () {
-      this.isActive = false
-      this.color = {}
-      this.bgColor = ''
     }
   }
 }

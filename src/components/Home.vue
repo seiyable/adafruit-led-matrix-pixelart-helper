@@ -5,12 +5,14 @@
   <div class="page-wrapper">
     <left-side-bar/>
     <div class="pixel-container">
-      <div v-for="y in $store.state.dimension.height" class="pixel-row">
+      <div v-for="row in $store.state.pixels" class="pixel-row">
         <pixel
-          v-for="x in $store.state.dimension.width"
-          :key="y + '-' + x"
-          :x="x - 1"
-          :y="y - 1"
+          v-for="pixel in row"
+          :key="pixel.x + '-' + pixel.y"
+          :x="pixel.x"
+          :y="pixel.y"
+          :bgColorValue="pixel.bgColorValue"
+          :isActive="pixel.isActive"
           />
       </div>
     </div>
@@ -29,6 +31,26 @@ export default {
   name: 'home',
   components: {
     LeftSideBar, RightSideBar, Pixel
+  },
+  created () {
+    this.$store.commit('initPixels')
+  },
+  computed: {
+    pixels () {
+      return this.$store.state.pixels
+    }
+  },
+  methods: {
+    getPixelBgColorValue (x, y) {
+      let pixel = this.pixels[y][x]
+      console.log('get pixel bg in home', pixel)
+      return pixel.bgColorValue
+    },
+    getPixelIsActive (x, y) {
+      let pixel = this.pixels[y][x]
+      console.log('get pixel active in home', pixel)
+      return pixel.isActive
+    }
   }
 }
 </script>

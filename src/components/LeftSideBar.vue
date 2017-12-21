@@ -13,26 +13,36 @@
     </div>
     <table class="color-slider-container">
       <tr class="color-slider-row">
-        <td>R: {{red}}</td><td><input v-model="red" type="range" min="0" :max="getMax" value="0" class="slider"></td>
+        <td>R: {{red}}</td><td><input v-model="red" type="range" :min="getMin" :max="getMax" value="0" class="slider"></td>
       </tr>
       <tr class="color-slider-row">
-        <td>G: {{green}}</td><td><input v-model="green" type="range" min="0" :max="getMax" value="0" class="slider"></td>
+        <td>G: {{green}}</td><td><input v-model="green" type="range" :min="getMin" :max="getMax" value="0" class="slider"></td>
       </tr>
       <tr class="color-slider-row">
-        <td>B: {{blue}}</td><td><input v-model="blue" type="range" min="0" :max="getMax" value="0" class="slider"></td>
+        <td>B: {{blue}}</td><td><input v-model="blue" type="range" :min="getMin" :max="getMax" value="0" class="slider"></td>
       </tr>
     </table>
     <div class="color-preview-wrapper">
-      <div class="color-preview" :style="{'background-color': getColorPreviewBgColor}"></div>
+      <div class="color-preview" :style="{'background-color': $store.state.selectedBgColorValue}"></div>
     </div>
     <h3>Drawing Mode</h3>
     <div class="drawing-option-wrapper">
-      <input type="radio" id="one-by-one" value="one-by-one" v-model="drawingMode">
-      <label for="one-by-one">One by one</label>
-      <input type="radio" id="keep-painting" value="keep-painting" v-model="drawingMode">
-      <label for="keep-painting">Keep painting</label>
-      <input type="radio" id="keep-erasing" value="keep-erasing" v-model="drawingMode">
-      <label for="keep-erasing">Keep erasing</label>
+      <div>
+        <input type="radio" id="one-by-one" value="one-by-one" v-model="drawingMode">
+        <label for="one-by-one">One by one</label>
+      </div>
+      <div>
+        <input type="radio" id="keep-painting" value="keep-painting" v-model="drawingMode">
+        <label for="keep-painting">Keep painting</label>
+      </div>
+      <div>
+        <input type="radio" id="keep-painting-large" value="keep-painting-large" v-model="drawingMode">
+        <label for="keep-painting-large">Keep painting large</label>
+      </div>
+      <div>
+        <input type="radio" id="keep-erasing" value="keep-erasing" v-model="drawingMode">
+        <label for="keep-erasing">Keep erasing</label>
+      </div>
     </div>
   </div>
 </template>
@@ -44,11 +54,11 @@
 export default {
   name: 'left-side-bar',
   computed: {
+    getMin () {
+      return 0
+    },
     getMax () {
       return Math.pow(2, this.colorBit) - 1
-    },
-    getColorPreviewBgColor () {
-      return 'rgb(' + this.getColor8bitValue(this.red) + ', ' + this.getColor8bitValue(this.green) + ', ' + this.getColor8bitValue(this.blue) + ')'
     },
     colorBit: {
       get () {
@@ -56,6 +66,7 @@ export default {
       },
       set (val) {
         this.$store.commit('updateSelectedColorBit', {colorBit: val})
+        this.$store.commit('initPixels')
       }
     },
     red: {
@@ -89,11 +100,6 @@ export default {
       set (val) {
         this.$store.commit('updateDrawingMode', {drawingMode: val})
       }
-    }
-  },
-  methods: {
-    getColor8bitValue (val) {
-      return val * Math.pow(2, 8 - this.colorBit)
     }
   }
 }

@@ -2,12 +2,14 @@
  Vue Template
 ================================================== -->
 <template>
-  <ul class="selected-pixel-list-container">
+  <div class="selected-pixel-list-container">
     <h3>Generated Code</h3>
-    <li v-for="p in $store.state.pixels" class="selected-pixel">
-      matrix.drawPixel( {{p.x}}, {{p.y}}, {{getMatrixColorText + '(' + p.color.red + ', ' + p.color.green + ', ' + p.color.blue + ')'}} );
-    </li>
-  </ul>
+    <ul>
+      <li v-for="p in $store.getters.getActivePixels" class="selected-pixel">
+        matrix.drawPixel( {{p.x}}, {{p.y}}, {{getMatrixColorText + '(' + p.color.r + ', ' + p.color.g + ', ' + p.color.b + ')'}} );
+      </li>
+    </ul>
+  </div>
 </template>
 
 <!-- =================================================
@@ -39,6 +41,13 @@ export default {
   padding: 20px;
   overflow-y: scroll;
   user-select: text;
+}
+
+h3 {
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 20px;
+  user-select: none;
 }
 
 .selected-pixel {
